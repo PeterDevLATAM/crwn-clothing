@@ -3,6 +3,7 @@ import "./menu-item.styles.scss";
 import { Link } from "react-router-dom";
 
 export default function MenuItem({ title, imageUrl, size, linkUrl }) {
+
   return (
     <Link to={`/${linkUrl}`} className={`${size} menu-item`}>
       <div
