@@ -1,5 +1,4 @@
 import firebase from "firebase/compat/app";
-/* firebase/compat/app */
 import "firebase/compat/firestore";
 import "firebase/compat/auth";
 
@@ -13,13 +12,38 @@ const firebaseConfig = {
   measurementId: "G-37VRYC7T2X",
 };
 
+
 firebase.initializeApp(firebaseConfig);
 
 export const auth = firebase.auth();
 export const firestore = firebase.firestore();
 
 const provider = new firebase.auth.GoogleAuthProvider();
-provider.setCustomParameters({prompt:'select_account'});
-export const signInWithGoogle = () => auth.signInWithPopup(provider)
+provider.setCustomParameters({ prompt: "select_account" });
+export const signInWithGoogle = () => auth.signInWithPopup(provider);
 
-export default firebase
+export default firebase;
+
+export const createUserProfileDocument = async (userAuth, aditionalData) => {
+  if (!userAuth) return;
+
+  const userRef = firestore.doc(`users/${userAuth.uid}`); //gets a reference of the document
+  const userSnapshot = await userRef.get(); //brings a snapshot of the document, now we can see if it exists and its data 
+
+  if (!userSnapshot.exists) { //if it doesn't exists attepmts to create one
+    const { displayName, email } = userAuth;
+    const createdAt = new Date();
+    try {
+      await userRef.set({
+        displayName,
+        email,
+        createdAt,
+        ...aditionalData,
+      });
+    } catch (error) {
+      console.log("Error creating User", error.message);
+    }
+  }
+  return userRef;
+  console.log(userSnapshot);
+};

@@ -10,7 +10,6 @@ export default class Directory extends Component {
   }
 
   render() {
-      console.log(this.state)
     return (
       <div className="directory-menu">
         {this.state.sections.map(({ id, ...otherProps}) => {

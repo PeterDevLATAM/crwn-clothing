@@ -6,7 +6,7 @@ import ShopPage from "./pages/ShopPage/ShopPage";
 import Header from "./components/Header/Header";
 import SignInSignUp from "./pages/sign-in-sign-up/SignInSignUp";
 
-import { auth } from "./firebase/firebase.utils";
+import { auth, createUserProfileDocument } from "./firebase/firebase.utils";
 import { Component } from "react/cjs/react.production.min";
 
 class App extends Component {
@@ -21,11 +21,27 @@ class App extends Component {
   //life cycle methods
 
   componentDidMount() {
-    this.unsuscribeFromAuth = auth.onAuthStateChanged((user) => {//auth.onAuthStateChanged gives back a function that when colled close up the subscription
+    //auth.onAuthStateChanged gives back a function that when colled close up the subscription
+    this.unsuscribeFromAuth = auth.onAuthStateChanged(async (userAuth) => {
+      if (userAuth) {
+        const userRef = await createUserProfileDocument(userAuth);
+        userRef.onSnapshot((snapShot) => {
+          this.setState(
+            {
+              currentUser: {
+                id: snapShot.id,
+                ...snapShot.data(),
+              },
+            },
+            () => {
+              console.log(this.state.currentUser);
+            }
+          );
+        });
+      }
       this.setState({
-        currentUser: user,
+        currentUser: userAuth,
       });
-      console.log(this.state.currentUser);
     });
   }
 
@@ -36,7 +52,7 @@ class App extends Component {
   render() {
     return (
       <>
-        <Header currentUser ={this.state.currentUser} />
+        <Header currentUser={this.state.currentUser} />
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/shop" element={<ShopPage />} />
