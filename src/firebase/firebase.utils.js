@@ -45,5 +45,4 @@ export const createUserProfileDocument = async (userAuth, aditionalData) => {
     }
   }
   return userRef;
-  console.log(userSnapshot);
 };
